@@ -1,0 +1,259 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Insurance Overview | SafeRide Insurance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=8">
+  <link rel="stylesheet" href="/css/dashboard.css?v=8">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+        SafeRide <span>Insurance</span>
+      </a>
+      <div class="nav-actions">
+        <span id="navUserName" style="font-weight: 600; color: var(--gray-700);"></span>
+        <button class="btn btn-sm btn-secondary" onclick="API.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <!-- Sidebar - dynamically built by API.initPortal() -->
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div style="font-weight: 700;" id="sidebarUserFullName">Loading...</div>
+        <div class="form-text" id="sidebarUserEmail">...</div>
+        <span class="user-role-badge" id="sidebarRoleBadge"></span>
+      </div>
+      <ul class="sidebar-menu" id="sidebarMenu"></ul>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <main class="main-content">
+      
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">
+          <h1>My Insurance Overview</h1>
+          <p>Welcome back, <span id="welcomeName" style="font-weight: 600; color: var(--shell-teal);">Valued Customer</span>. Manage your vehicles, policies, coverage and claims from one place.</p>
+        </div>
+        <div>
+          <a href="/claim-submit.html" class="btn btn-primary">
+            <i class="fas fa-file-circle-plus"></i> Submit a Claim
+          </a>
+        </div>
+      </div>
+
+      <!-- KPI Stats Grid (Claims Standard: [ICON] KPI LABEL / VALUE) -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon teal"><i class="fas fa-car"></i></div>
+          <div class="stat-info">
+            <h4>Insured Vehicles</h4>
+            <div class="stat-value" id="statVehicles">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-shield-halved"></i></div>
+          <div class="stat-info">
+            <h4>Active Policies</h4>
+            <div class="stat-value" id="statActivePolicies">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="fas fa-file-lines"></i></div>
+          <div class="stat-info">
+            <h4>Filed Claims</h4>
+            <div class="stat-value" id="statClaims">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="fas fa-calculator"></i></div>
+          <div class="stat-info">
+            <h4>Saved Quotes</h4>
+            <div class="stat-value" id="statQuotes">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Access (Claims Standard) -->
+      <h3 class="dashboard-section-title"><i class="fas fa-bolt" style="color: var(--accent);"></i> Quick Access</h3>
+      <div class="actions-grid">
+        <a href="/vehicle-management.html" class="action-tile">
+          <i class="fas fa-car"></i>
+          <strong>Register Vehicle</strong>
+          <span class="form-text">Add a car, bike, or commercial vehicle</span>
+        </a>
+
+        <a href="/policy-management.html" class="action-tile">
+          <i class="fas fa-shield-alt"></i>
+          <strong>My Policies</strong>
+          <span class="form-text">Review active coverages and certificate terms</span>
+        </a>
+
+        <a href="/claim-submit.html" class="action-tile">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <strong>Submit a Claim</strong>
+          <span class="form-text">File incident details and damage report</span>
+        </a>
+
+        <a href="/claim-track.html" class="action-tile">
+          <i class="fas fa-timeline"></i>
+          <strong>Track Claims</strong>
+          <span class="form-text">Follow live status and assessor progress</span>
+        </a>
+      </div>
+
+      <!-- Active Coverages & Recent Claims Split Grid -->
+      <div class="dashboard-split-grid">
+        <!-- Active Coverages Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-shield-alt" style="color: var(--shell-teal);"></i>
+              <span>Active Coverages</span>
+            </div>
+            <a href="/policy-management.html" class="btn btn-sm btn-secondary">View All <i class="fas fa-arrow-right"></i></a>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Policy No</th>
+                  <th>Vehicle</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="policiesTableBody">
+                <tr><td colspan="4" style="text-align: center; color: var(--shell-text-muted); padding: 1.5rem;">Loading policies...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Claims History Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-clock-rotate-left" style="color: var(--accent);"></i>
+              <span>Recent Claims History</span>
+            </div>
+            <a href="/claim-track.html" class="btn btn-sm btn-secondary">Track All <i class="fas fa-arrow-right"></i></a>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Type</th>
+                  <th>Incident Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="claimsTableBody">
+                <tr><td colspan="4" style="text-align: center; color: var(--shell-text-muted); padding: 1.5rem;">Loading claims history...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/js/api.js?v=8"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = API.initPortal();
+      if (!user) return;
+
+      const firstName = (user.fullName || '').split(' ')[0] || 'Valued Customer';
+      const welcomeEl = document.getElementById('welcomeName');
+      if (welcomeEl) welcomeEl.textContent = firstName;
+
+      try {
+        // 1. Fetch Customer Vehicles
+        const vRes = await API.request('/vehicles/customer/' + user.id);
+        const vehicles = vRes.data || [];
+        const statVehiclesEl = document.getElementById('statVehicles');
+        if (statVehiclesEl) statVehiclesEl.textContent = vehicles.length;
+
+        // 2. Fetch Customer Policies
+        const pRes = await API.request('/policies/customer/' + user.id);
+        const policies = pRes.data || [];
+        const activeCount = policies.filter(p => p.status === 'ACTIVE' || p.status === 'RENEWED').length;
+        const statPoliciesEl = document.getElementById('statActivePolicies');
+        if (statPoliciesEl) statPoliciesEl.textContent = activeCount;
+
+        const pBody = document.getElementById('policiesTableBody');
+        if (pBody) {
+          if (policies.length === 0) {
+            pBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--shell-text-muted); padding: 1.5rem;">No policies found. <a href="/premium-calculator.html" style="color: var(--shell-teal); font-weight: 600;">Get a quote now &rarr;</a></td></tr>';
+          } else {
+            pBody.innerHTML = policies.slice(0, 5).map(p => {
+              const isActive = p.status === 'ACTIVE' || p.status === 'RENEWED';
+              const badgeCls = isActive ? 'success' : 'secondary';
+              const vehicleText = p.vehicle ? `${p.vehicle.make || ''} ${p.vehicle.model || ''}`.trim() : 'N/A';
+              return `
+                <tr>
+                  <td><strong>${p.policyNumber || 'N/A'}</strong></td>
+                  <td>${vehicleText}</td>
+                  <td><span class="badge badge-info">${p.policyType || 'STANDARD'}</span></td>
+                  <td><span class="badge badge-${badgeCls}">${p.status}</span></td>
+                </tr>
+              `;
+            }).join('');
+          }
+        }
+
+        // 3. Fetch Customer Claims
+        const cRes = await API.request('/claims/customer/' + user.id);
+        const claims = cRes.data || [];
+        const statClaimsEl = document.getElementById('statClaims');
+        if (statClaimsEl) statClaimsEl.textContent = claims.length;
+
+        const cBody = document.getElementById('claimsTableBody');
+        if (cBody) {
+          if (claims.length === 0) {
+            cBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--shell-text-muted); padding: 1.5rem;">No claims filed yet.</td></tr>';
+          } else {
+            cBody.innerHTML = claims.slice(0, 5).map(c => {
+              const badgeCls = (c.status === 'APPROVED' || c.status === 'SETTLED') ? 'success'
+                             : (c.status === 'REJECTED' || c.status === 'WITHDRAWN') ? 'danger'
+                             : 'warning';
+              return `
+                <tr>
+                  <td><strong>${c.claimReference || 'N/A'}</strong></td>
+                  <td>${c.claimType || 'GENERAL'}</td>
+                  <td>${c.incidentDate || 'N/A'}</td>
+                  <td><span class="badge badge-${badgeCls}">${(c.status || '').replace(/_/g, ' ')}</span></td>
+                </tr>
+              `;
+            }).join('');
+          }
+        }
+
+        // 4. Fetch Customer Quotes
+        const qRes = await API.request('/quotes/customer/' + user.id);
+        const quotes = qRes.data || [];
+        const statQuotesEl = document.getElementById('statQuotes');
+        if (statQuotesEl) statQuotesEl.textContent = quotes.length;
+
+      } catch (err) {
+        console.error('Error loading customer dashboard data:', err);
+      }
+    });
+  </script>
+</body>
+</html>

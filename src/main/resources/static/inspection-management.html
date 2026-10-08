@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspection & Damage Assessment | SafeRide Insurance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=7">
+  <link rel="stylesheet" href="/css/dashboard.css?v=7">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+        SafeRide <span>Insurance</span>
+      </a>
+      <div class="nav-actions">
+        <span id="navUserName" style="font-weight: 600; color: var(--gray-700);"></span>
+        <button class="btn btn-sm btn-secondary" onclick="API.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <!-- Sidebar — dynamically built by API.initPortal() -->
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div style="font-weight: 700;" id="sidebarUserFullName">Loading...</div>
+        <div class="form-text" id="sidebarUserEmail">...</div>
+        <span class="user-role-badge" id="sidebarRoleBadge"></span>
+      </div>
+      <ul class="sidebar-menu" id="sidebarMenu"></ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <div class="page-title">
+          <h1>Vehicle Inspection & Damage Assessment Desk</h1>
+          <p>Pre-policy underwriting verifications, post-collision technical assessments, and authorized repair cost estimations.</p>
+        </div>
+        <div>
+          <button class="btn btn-primary" id="btnOpenAddInsp"><i class="fas fa-plus"></i> Book Technical Inspection</button>
+        </div>
+      </div>
+
+      <!-- Inspections Table Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-list-check" style="color: var(--primary-light);"></i> Technical Inspection Reports Queue</div>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Inspection Ref</th>
+                <th>Type</th>
+                <th>Vehicle</th>
+                <th>Date & Location</th>
+                <th>Damage Severity</th>
+                <th>Repair Estimate</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inspectionsTbody">
+              <tr><td colspan="8" style="text-align: center;">Loading technical inspection records...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Book / Edit Inspection Modal -->
+  <div class="modal-backdrop" id="inspModal">
+    <div class="modal-content" style="max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header" style="flex-shrink: 0;">
+        <h3 class="card-title" id="modalInspTitle"><i class="fas fa-tools" style="color: var(--primary);"></i> Book Inspection</h3>
+        <button class="modal-close" id="closeInspModal">&times;</button>
+      </div>
+      <form id="inspForm" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; margin: 0;">
+        <input type="hidden" id="editInspId">
+        <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 135px); padding: 1.75rem;">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Inspection Category</label>
+              <select class="form-select" id="inspType" required>
+                <option value="DAMAGE_ASSESSMENT">Post-Collision Damage Assessment</option>
+                <option value="PRE_POLICY">Pre-Policy Underwriting Inspection</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Inspected Vehicle</label>
+              <select class="form-select" id="inspVehicle" required>
+                <option value="">-- Choose Vehicle --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Inspection Scheduled Date</label>
+              <input type="date" class="form-control" id="inspDate" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Inspection Yard / Location</label>
+              <input type="text" class="form-control" id="inspLocation" placeholder="e.g. Colombo Central Yard" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Damage Severity</label>
+              <select class="form-select" id="inspSeverity">
+                <option value="NONE">None / Pristine Condition</option>
+                <option value="MINOR">Minor (Scratches / Small Dents)</option>
+                <option value="MODERATE">Moderate (Panels, Lights, Bumpers)</option>
+                <option value="SEVERE">Severe / Structural Chassis Damage</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estimated Repair Cost (LKR)</label>
+              <input type="number" class="form-control" id="inspRepairCost" value="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Physical Condition Findings & Technical Notes</label>
+            <textarea class="form-control" id="inspNotes" rows="3" placeholder="Document physical examination findings, odometer check, paint thickness, structural alignment..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Required Parts Replacement</label>
+              <input type="text" class="form-control" id="inspParts" placeholder="e.g. Front Bumper Cover, Fog Lamp Bracket">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Inspection Status</label>
+              <select class="form-select" id="inspStatus">
+                <option value="PENDING">PENDING</option>
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="COMPLETED">COMPLETED</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="flex-shrink: 0;">
+          <button type="button" class="btn btn-secondary" id="btnCancelInsp">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Inspection Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js?v=7"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = API.initPortal();
+      if (!user) return;
+
+      document.getElementById('inspDate').value = new Date().toISOString().split('T')[0];
+
+      const modal = document.getElementById('inspModal');
+      let allInspections = [];
+
+      document.getElementById('btnOpenAddInsp').addEventListener('click', () => {
+        document.getElementById('editInspId').value = '';
+        document.getElementById('modalInspTitle').innerHTML = '<i class="fas fa-tools"></i> Book Inspection';
+        document.getElementById('inspForm').reset();
+        document.getElementById('inspDate').value = new Date().toISOString().split('T')[0];
+        modal.classList.add('show');
+      });
+
+      document.getElementById('closeInspModal').addEventListener('click', () => modal.classList.remove('show'));
+      document.getElementById('btnCancelInsp').addEventListener('click', () => modal.classList.remove('show'));
+
+      async function loadVehicles() {
+        try {
+          const res = await API.request('/vehicles');
+          const vehicles = res.data || [];
+          const select = document.getElementById('inspVehicle');
+          select.innerHTML = '<option value="">-- Choose Vehicle --</option>' +
+            vehicles.map(v => `<option value="${v.id}">${v.registrationNumber} - ${v.make} ${v.model}</option>`).join('');
+        } catch (e) {}
+      }
+
+      async function loadInspections() {
+        try {
+          const res = await API.request('/inspections');
+          allInspections = res.data || [];
+          const tbody = document.getElementById('inspectionsTbody');
+
+          if (allInspections.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--gray-500);">No inspection records found.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = allInspections.map(i => `
+            <tr>
+              <td><strong>${i.inspectionReference}</strong></td>
+              <td><span class="badge badge-info">${i.inspectionType.replace('_', ' ')}</span></td>
+              <td>${i.vehicle ? i.vehicle.registrationNumber + ' (' + i.vehicle.make + ')' : 'N/A'}</td>
+              <td>${i.inspectionDate}<br><span class="form-text">${i.inspectionLocation}</span></td>
+              <td><span class="badge badge-${i.damageSeverity === 'SEVERE' ? 'danger' : i.damageSeverity === 'MODERATE' ? 'warning' : 'success'}">${i.damageSeverity}</span></td>
+              <td>${API.formatLKR(i.estimatedRepairCost)}</td>
+              <td><span class="badge badge-${i.status === 'COMPLETED' ? 'success' : i.status === 'CANCELLED' ? 'danger' : 'warning'}">${i.status}</span></td>
+              <td>
+                <div style="display: flex; gap: 0.35rem;">
+                  <button class="btn btn-sm btn-secondary" onclick="editInspection(${i.id})"><i class="fas fa-edit"></i> Edit</button>
+                  ${i.status !== 'CANCELLED' ? `<button class="btn btn-sm btn-danger" onclick="cancelInspection(${i.id}, '${i.inspectionReference}')"><i class="fas fa-ban"></i> Cancel</button>` : ''}
+                </div>
+              </td>
+            </tr>
+          `).join('');
+        } catch (err) {}
+      }
+
+      window.editInspection = function(id) {
+        const i = allInspections.find(item => item.id === id);
+        if (!i) return;
+
+        document.getElementById('editInspId').value = i.id;
+        document.getElementById('modalInspTitle').innerHTML = '<i class="fas fa-edit"></i> Update Inspection Assessment';
+        document.getElementById('inspType').value = i.inspectionType;
+        document.getElementById('inspVehicle').value = i.vehicle ? i.vehicle.id : '';
+        document.getElementById('inspDate').value = i.inspectionDate;
+        document.getElementById('inspLocation').value = i.inspectionLocation;
+        document.getElementById('inspSeverity').value = i.damageSeverity || 'MODERATE';
+        document.getElementById('inspRepairCost').value = i.estimatedRepairCost || 0;
+        document.getElementById('inspNotes').value = i.physicalConditionNotes || '';
+        document.getElementById('inspParts').value = i.partsToReplace || '';
+        document.getElementById('inspStatus').value = i.status;
+
+        modal.classList.add('show');
+      };
+
+      window.cancelInspection = async function(id, ref) {
+        if (confirm(`Cancel inspection request ${ref}? (Delete Operation)`)) {
+          try {
+            await API.request('/inspections/' + id, { method: 'DELETE' });
+            API.toast('Inspection ' + ref + ' has been cancelled', 'warning');
+            loadInspections();
+          } catch (err) {}
+        }
+      };
+
+      document.getElementById('inspForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const editId = document.getElementById('editInspId').value;
+        const payload = {
+          vehicleId: parseInt(document.getElementById('inspVehicle').value),
+          inspectorId: user.id,
+          inspectionType: document.getElementById('inspType').value,
+          inspectionDate: document.getElementById('inspDate').value,
+          inspectionLocation: document.getElementById('inspLocation').value.trim(),
+          damageSeverity: document.getElementById('inspSeverity').value,
+          estimatedRepairCost: parseFloat(document.getElementById('inspRepairCost').value || 0),
+          physicalConditionNotes: document.getElementById('inspNotes').value.trim(),
+          partsToReplace: document.getElementById('inspParts').value.trim(),
+          status: document.getElementById('inspStatus').value
+        };
+
+        try {
+          if (editId) {
+            await API.request('/inspections/' + editId, {
+              method: 'PUT',
+              body: JSON.stringify(payload)
+            });
+            API.toast('Inspection assessment updated successfully', 'success');
+          } else {
+            await API.request('/inspections', {
+              method: 'POST',
+              body: JSON.stringify(payload)
+            });
+            API.toast('Inspection scheduled successfully', 'success');
+          }
+          modal.classList.remove('show');
+          loadInspections();
+        } catch (err) {}
+      });
+
+      loadVehicles();
+      loadInspections();
+    });
+  </script>
+</body>
+</html>
+
+

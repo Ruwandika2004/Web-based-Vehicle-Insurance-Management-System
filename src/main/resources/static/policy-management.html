@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insurance Policy Management | SafeRide Insurance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=7">
+  <link rel="stylesheet" href="/css/dashboard.css?v=7">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+        SafeRide <span>Insurance</span>
+      </a>
+      <div class="nav-actions">
+        <span id="navUserName" style="font-weight: 600; color: var(--gray-700);"></span>
+        <button class="btn btn-sm btn-secondary" onclick="API.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <!-- Sidebar — dynamically built by API.initPortal() -->
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div style="font-weight: 700;" id="sidebarUserFullName">Loading...</div>
+        <div class="form-text" id="sidebarUserEmail">...</div>
+        <span class="user-role-badge" id="sidebarRoleBadge"></span>
+      </div>
+      <ul class="sidebar-menu" id="sidebarMenu"></ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <div class="page-title">
+          <h1>Policy Portfolio & Underwriting Administration</h1>
+          <p>Issue Comprehensive and Third-Party policies, customize deductible limits, process annual renewals, and manage endorsements.</p>
+        </div>
+        <div>
+          <button class="btn btn-primary" id="btnOpenIssuePolicy"><i class="fas fa-file-signature"></i> Issue New Policy</button>
+        </div>
+      </div>
+
+      <!-- Policy Cards Grid -->
+      <div id="policiesList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;">
+        <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">Loading insurance policies...</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Issue Policy Modal -->
+  <div class="modal-backdrop" id="policyModal">
+    <div class="modal-content" style="max-width: 650px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header" style="flex-shrink: 0;">
+        <h3 class="card-title"><i class="fas fa-shield-alt" style="color: var(--primary);"></i> Issue Insurance Policy</h3>
+        <button class="modal-close" id="closePolicyModal">&times;</button>
+      </div>
+      <form id="policyForm" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; margin: 0;">
+        <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 135px); padding: 1.75rem;">
+          <div class="form-group">
+            <label class="form-label">Select Registered Vehicle</label>
+            <select class="form-select" id="policyVehicle" required>
+              <option value="">-- Choose Insured Vehicle --</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Policy Tier / Type</label>
+              <select class="form-select" id="policyType" required>
+                <option value="COMPREHENSIVE">Comprehensive Full Cover</option>
+                <option value="THIRD_PARTY">Third-Party Only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sum Insured (LKR)</label>
+              <input type="number" class="form-control" id="policySumInsured" value="8500000" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Policy Start Date</label>
+              <input type="date" class="form-control" id="policyStart" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Policy End Date</label>
+              <input type="date" class="form-control" id="policyEnd" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Calculated Annual Premium (LKR)</label>
+              <input type="number" class="form-control" id="policyPremium" value="125000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Standard Deductible (LKR)</label>
+              <input type="number" class="form-control" id="policyDeductible" value="5000" required>
+            </div>
+          </div>
+
+          <div id="compPerilsBox">
+            <label class="form-label">Included Perils & Riders</label>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+              <label><input type="checkbox" id="chkNatural" checked> Natural Disasters (Flood/Storm)</label>
+              <label><input type="checkbox" id="chkTheft" checked> Total Loss & Theft</label>
+              <label><input type="checkbox" id="chkRiot" checked> Riot & Civil Commotion</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="flex-shrink: 0;">
+          <button type="button" class="btn btn-secondary" id="btnCancelPolicy">Cancel</button>
+          <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Issue Policy Now</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js?v=7"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = API.initPortal();
+      if (!user) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      const nextYear = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0];
+      document.getElementById('policyStart').value = today;
+      document.getElementById('policyEnd').value = nextYear;
+
+      const modal = document.getElementById('policyModal');
+      document.getElementById('btnOpenIssuePolicy').addEventListener('click', () => modal.classList.add('show'));
+      document.getElementById('closePolicyModal').addEventListener('click', () => modal.classList.remove('show'));
+      document.getElementById('btnCancelPolicy').addEventListener('click', () => modal.classList.remove('show'));
+
+      // Populate vehicle selector
+      async function populateVehicles() {
+        try {
+          const res = await API.request('/vehicles/customer/' + user.id);
+          const vehicles = res.data || [];
+          const select = document.getElementById('policyVehicle');
+          select.innerHTML = '<option value="">-- Choose Insured Vehicle --</option>' +
+            vehicles.map(v => `<option value="${v.id}" data-val="${v.marketValue}">${v.registrationNumber} - ${v.make} ${v.model}</option>`).join('');
+
+          select.addEventListener('change', () => {
+            const opt = select.options[select.selectedIndex];
+            if (opt && opt.dataset.val) {
+              const val = parseFloat(opt.dataset.val);
+              document.getElementById('policySumInsured').value = val;
+              document.getElementById('policyPremium').value = (val * 0.014).toFixed(0);
+            }
+          });
+        } catch (e) {}
+      }
+
+      async function loadPolicies() {
+        try {
+          const res = await API.request('/policies/customer/' + user.id);
+          const policies = res.data || [];
+          const container = document.getElementById('policiesList');
+
+          if (policies.length === 0) {
+            container.innerHTML = `
+              <div class="card" style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                <i class="fas fa-shield-blank" style="font-size: 3rem; color: var(--gray-300); margin-bottom: 1rem;"></i>
+                <h3>No Insurance Policies Issued Yet</h3>
+                <p class="form-text" style="margin-bottom: 1.5rem;">Issue a comprehensive or third-party policy for your registered vehicles.</p>
+                <button class="btn btn-primary" onclick="document.getElementById('policyModal').classList.add('show')"><i class="fas fa-file-signature"></i> Issue First Policy</button>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = policies.map(p => `
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <strong style="color: var(--primary); font-size: 1.05rem;">${p.policyNumber}</strong>
+                  <div class="form-text">Expires: ${p.endDate}</div>
+                </div>
+                <span class="badge badge-${p.status === 'ACTIVE' || p.status === 'RENEWED' ? 'success' : 'danger'}">${p.status}</span>
+              </div>
+              <div style="font-size: 0.92rem; color: var(--gray-700); margin-bottom: 1.25rem;">
+                <p><strong>Insured Vehicle:</strong> ${p.vehicle ? p.vehicle.registrationNumber + ' (' + p.vehicle.make + ' ' + p.vehicle.model + ')' : 'N/A'}</p>
+                <p><strong>Policy Coverage:</strong> <span class="badge badge-info">${p.policyType}</span></p>
+                <p><strong>Sum Insured:</strong> ${API.formatLKR(p.sumInsured)}</p>
+                <p><strong>Annual Premium:</strong> <strong style="color: var(--secondary);">${API.formatLKR(p.totalAnnualPremium)}</strong></p>
+                <p><strong>Deductible:</strong> ${API.formatLKR(p.deductibleAmount)}</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; justify-content: space-between; border-top: 1px solid var(--gray-100); padding-top: 1rem; flex-wrap: wrap;">
+                <button class="btn btn-sm btn-secondary" onclick="openReceiptModal('${p.policyNumber}', '${p.startDate}', ${p.totalAnnualPremium}, '${p.vehicle ? p.vehicle.registrationNumber : 'N/A'}')"><i class="fas fa-receipt"></i> Payment Receipt</button>
+                ${p.status !== 'CANCELLED' ? `
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-sm btn-success" onclick="renewPolicy(${p.id})"><i class="fas fa-rotate"></i> Renew</button>
+                    <button class="btn btn-sm btn-danger" onclick="cancelPolicy(${p.id}, '${p.policyNumber}')"><i class="fas fa-ban"></i> Cancel</button>
+                  </div>
+                ` : '<span class="form-text" style="color: var(--danger);">Policy is Terminated</span>'}
+              </div>
+            </div>
+          `).join('');
+        } catch (err) {}
+      }
+
+      window.openReceiptModal = function(polNo, date, premium, vehicleReg) {
+        document.getElementById('receiptPolNo').textContent = polNo;
+        document.getElementById('receiptDate').textContent = date;
+        document.getElementById('receiptVehicle').textContent = vehicleReg;
+        document.getElementById('receiptAmount').textContent = API.formatLKR(premium);
+        document.getElementById('receiptTxnId').textContent = 'TXN-SR-' + Math.floor(100000 + Math.random() * 900000);
+        document.getElementById('receiptModal').classList.add('show');
+      };
+
+      window.closeReceiptModal = function() {
+        document.getElementById('receiptModal').classList.remove('show');
+      };
+
+      window.renewPolicy = async function(id) {
+        if (confirm('Renew this policy for an additional 1 year period?')) {
+          try {
+            await API.request(`/policies/${id}/renew?additionalYears=1`, { method: 'PUT' });
+            API.toast('Policy successfully renewed for 1 year!', 'success');
+            loadPolicies();
+          } catch (err) {}
+        }
+      };
+
+      window.cancelPolicy = async function(id, polNo) {
+        if (confirm(`Are you sure you want to cancel policy ${polNo}? (Delete Operation)`)) {
+          try {
+            await API.request(`/policies/${id}`, { method: 'DELETE' });
+            API.toast('Policy ' + polNo + ' has been cancelled', 'warning');
+            loadPolicies();
+          } catch (err) {}
+        }
+      };
+
+      document.getElementById('policyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+          customerId: user.id,
+          vehicleId: parseInt(document.getElementById('policyVehicle').value),
+          policyType: document.getElementById('policyType').value,
+          startDate: document.getElementById('policyStart').value,
+          endDate: document.getElementById('policyEnd').value,
+          sumInsured: parseFloat(document.getElementById('policySumInsured').value),
+          totalAnnualPremium: parseFloat(document.getElementById('policyPremium').value),
+          deductibleAmount: parseFloat(document.getElementById('policyDeductible').value),
+          includesNaturalDisaster: document.getElementById('chkNatural').checked,
+          includesTheft: document.getElementById('chkTheft').checked,
+          includesRiotStrike: document.getElementById('chkRiot').checked
+        };
+
+        try {
+          const res = await API.request('/policies', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+          API.toast('Policy successfully created: ' + res.data.policyNumber, 'success');
+          modal.classList.remove('show');
+          loadPolicies();
+        } catch (err) {}
+      });
+
+      populateVehicles();
+      loadPolicies();
+    });
+  </script>
+
+  <!-- Payment Receipt Modal -->
+  <div class="modal-backdrop" id="receiptModal">
+    <div class="modal-content" style="max-width: 520px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header" style="flex-shrink: 0;">
+        <h3 class="card-title"><i class="fas fa-receipt" style="color: var(--secondary);"></i> Official Payment Receipt</h3>
+        <button class="modal-close" onclick="closeReceiptModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 135px); padding: 1.5rem;">
+        <div style="text-align: center; border-bottom: 2px dashed var(--slate-200); padding-bottom: 1.25rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">SafeRide Insurance Systems</div>
+          <div style="font-size: 0.82rem; color: var(--slate-500);">Electronic Premium Payment Voucher & Confirmation</div>
+          <span class="badge badge-success" style="margin-top: 0.5rem;"><i class="fas fa-check-circle"></i> Transaction Verified & Paid</span>
+        </div>
+
+        <div style="font-size: 0.92rem; display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--slate-500);">Transaction ID:</span>
+            <code id="receiptTxnId">TXN-SR-884910</code>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--slate-500);">Policy Number:</span>
+            <strong id="receiptPolNo">POL-2026-COMP-001</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--slate-500);">Insured Vehicle:</span>
+            <span id="receiptVehicle">WP-CAB-4521</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--slate-500);">Payment Date:</span>
+            <span id="receiptDate">2026-01-01</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--slate-500);">Payment Method:</span>
+            <span>Electronic Card / Bank Transfer</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--slate-200); padding-top: 0.75rem; margin-top: 0.25rem;">
+            <strong style="color: var(--slate-900); font-size: 1.05rem;">Total Premium Paid:</strong>
+            <strong style="color: var(--secondary); font-size: 1.15rem;" id="receiptAmount">LKR 0.00</strong>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="flex-shrink: 0;">
+        <button type="button" class="btn btn-secondary" onclick="window.print()"><i class="fas fa-print"></i> Print Receipt</button>
+        <button type="button" class="btn btn-primary" onclick="closeReceiptModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+

@@ -1,0 +1,283 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Branch Performance Overview | SafeRide Insurance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=8">
+  <link rel="stylesheet" href="/css/dashboard.css?v=8">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+        SafeRide <span>Insurance</span>
+      </a>
+      <div class="nav-actions">
+        <span id="navUserName" style="font-weight: 600; color: var(--gray-700);"></span>
+        <button class="btn btn-sm btn-secondary" onclick="API.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <!-- Sidebar - dynamically built by API.initPortal() -->
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div style="font-weight: 700;" id="sidebarUserFullName">Loading...</div>
+        <div class="form-text" id="sidebarUserEmail">...</div>
+        <span class="user-role-badge" id="sidebarRoleBadge"></span>
+      </div>
+      <ul class="sidebar-menu" id="sidebarMenu"></ul>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <main class="main-content">
+      
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">
+          <h1>Branch Performance Overview</h1>
+          <p>Monitor customers, policies, claims, vehicles and branch operations.</p>
+        </div>
+        <div>
+          <a href="/claim-manage.html" class="btn btn-primary">
+            <i class="fas fa-gavel"></i> Claims Queue
+          </a>
+        </div>
+      </div>
+
+      <!-- KPI Stats Grid (Claims Standard: [ICON] KPI LABEL / VALUE) -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-sack-dollar"></i></div>
+          <div class="stat-info">
+            <h4>Branch Revenue</h4>
+            <div class="stat-value" id="statTotalPremiums" style="font-size: 1.45rem;">LKR 0.00</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-shield-halved"></i></div>
+          <div class="stat-info">
+            <h4>Active Policies</h4>
+            <div class="stat-value" id="statActivePolicies">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="fas fa-gavel"></i></div>
+          <div class="stat-info">
+            <h4>Open Claims Queue</h4>
+            <div class="stat-value" id="statPendingClaims">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+          <div class="stat-info">
+            <h4>Total Customers</h4>
+            <div class="stat-value" id="statTotalCustomers">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Branch Oversight Modules (Claims Standard) -->
+      <h3 class="dashboard-section-title"><i class="fas fa-bolt" style="color: var(--accent);"></i> Branch Oversight Modules</h3>
+      <div class="actions-grid">
+        <a href="/customer-management.html" class="action-tile">
+          <i class="fas fa-users"></i>
+          <strong>Customer Directory</strong>
+          <span class="form-text">Review client KYC profiles &amp; assets</span>
+        </a>
+
+        <a href="/policy-management.html" class="action-tile">
+          <i class="fas fa-shield-alt"></i>
+          <strong>Policy Overview</strong>
+          <span class="form-text">Inspect active policies and renewals</span>
+        </a>
+
+        <a href="/claim-manage.html" class="action-tile">
+          <i class="fas fa-gavel"></i>
+          <strong>Claims Pipeline</strong>
+          <span class="form-text">Monitor adjudication and approvals</span>
+        </a>
+
+        <a href="/vehicle-management.html" class="action-tile">
+          <i class="fas fa-car"></i>
+          <strong>Fleet Registry</strong>
+          <span class="form-text">View all registered insured vehicles</span>
+        </a>
+      </div>
+
+      <!-- Two-column layout: Claims Pipeline Table + Branch Operations Workload -->
+      <div class="dashboard-split-grid">
+        <!-- Claims Pipeline Table Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-gavel" style="color: var(--shell-teal);"></i>
+              <span>Claims Pipeline &mdash; Branch Overview</span>
+            </div>
+            <a href="/claim-manage.html" class="btn btn-sm btn-secondary">Full Queue <i class="fas fa-arrow-right"></i></a>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Claim Ref</th>
+                  <th>Type</th>
+                  <th>Incident Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="branchClaimsTbody">
+                <tr><td colspan="5" style="text-align: center; color: var(--shell-text-muted); padding: 1.5rem;">Loading claims data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Branch Operations Workload Summary Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-chart-pie" style="color: var(--shell-teal);"></i>
+              <span>Live Operations Workload</span>
+            </div>
+          </div>
+          <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.85rem; border-bottom: 1px solid var(--shell-border);">
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(245, 158, 11, 0.12); color: #D97706; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">
+                  <i class="fas fa-inbox"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.88rem; color: var(--shell-text-main);">Pending Desk Review</div>
+                  <div style="font-size: 0.75rem; color: var(--shell-text-muted);">Initial claim submissions</div>
+                </div>
+              </div>
+              <div id="attnPending" style="font-size: 1.15rem; font-weight: 800; color: #D97706;">0</div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.85rem; border-bottom: 1px solid var(--shell-border);">
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(37, 99, 235, 0.12); color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">
+                  <i class="fas fa-microscope"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.88rem; color: var(--shell-text-main);">Under Assessment</div>
+                  <div style="font-size: 0.75rem; color: var(--shell-text-muted);">Claims officer reviews</div>
+                </div>
+              </div>
+              <div id="attnReview" style="font-size: 1.15rem; font-weight: 800; color: #2563EB;">0</div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.85rem; border-bottom: 1px solid var(--shell-border);">
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(147, 51, 234, 0.12); color: #9333EA; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">
+                  <i class="fas fa-car-burst"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.88rem; color: var(--shell-text-main);">Inspections Booked</div>
+                  <div style="font-size: 0.75rem; color: var(--shell-text-muted);">Technical vehicle damage assessments</div>
+                </div>
+              </div>
+              <div id="attnInspection" style="font-size: 1.15rem; font-weight: 800; color: #9333EA;">0</div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(16, 185, 129, 0.12); color: #059669; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">
+                  <i class="fas fa-circle-check"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.88rem; color: var(--shell-text-main);">Approved / Settled</div>
+                  <div style="font-size: 0.75rem; color: var(--shell-text-muted);">Successfully closed claims</div>
+                </div>
+              </div>
+              <div id="attnSettled" style="font-size: 1.15rem; font-weight: 800; color: #059669;">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/js/api.js?v=8"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = API.initPortal();
+      if (!user) return;
+
+      try {
+        const res = await API.request('/dashboard/summary');
+        const s = res.data || {};
+        const revEl = document.getElementById('statTotalPremiums');
+        const polEl = document.getElementById('statActivePolicies');
+        const clmEl = document.getElementById('statPendingClaims');
+        const cstEl = document.getElementById('statTotalCustomers');
+
+        if (revEl) revEl.textContent  = API.formatLKR(s.totalPremiumsCollected);
+        if (polEl) polEl.textContent  = s.activePolicies || 0;
+        if (clmEl) clmEl.textContent  = s.pendingClaims || 0;
+        if (cstEl) cstEl.textContent  = s.totalCustomers || 0;
+      } catch(err) {
+        console.error('Error loading branch dashboard summary:', err);
+      }
+
+      try {
+        const cRes = await API.request('/claims');
+        const claims = cRes.data || [];
+
+        // Operational Workload breakdown from real data
+        const pending    = claims.filter(c => c.status === 'SUBMITTED').length;
+        const underRev   = claims.filter(c => c.status === 'UNDER_REVIEW').length;
+        const inspection = claims.filter(c => c.status === 'INSPECTION_SCHEDULED').length;
+        const settled    = claims.filter(c => c.status === 'APPROVED' || c.status === 'SETTLED').length;
+
+        const aPen = document.getElementById('attnPending');
+        const aRev = document.getElementById('attnReview');
+        const aIns = document.getElementById('attnInspection');
+        const aSet = document.getElementById('attnSettled');
+
+        if (aPen) aPen.textContent = pending;
+        if (aRev) aRev.textContent = underRev;
+        if (aIns) aIns.textContent = inspection;
+        if (aSet) aSet.textContent = settled;
+
+        // Recent claims table
+        const tbody = document.getElementById('branchClaimsTbody');
+        if (tbody) {
+          if (claims.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--shell-text-muted); padding: 1.5rem;">No claims on record.</td></tr>';
+          } else {
+            tbody.innerHTML = claims.slice(0, 6).map(c => {
+              const badgeCls = (c.status === 'APPROVED' || c.status === 'SETTLED') ? 'success'
+                             : (c.status === 'REJECTED' || c.status === 'WITHDRAWN') ? 'danger'
+                             : 'warning';
+              return `
+                <tr>
+                  <td><strong>${c.claimReference || 'N/A'}</strong></td>
+                  <td>${c.claimType || 'GENERAL'}</td>
+                  <td>${c.incidentDate || 'N/A'}</td>
+                  <td>${API.formatLKR(c.estimatedDamageAmount || c.claimedAmount || 0)}</td>
+                  <td><span class="badge badge-${badgeCls}">${(c.status || '').replace(/_/g, ' ')}</span></td>
+                </tr>
+              `;
+            }).join('');
+          }
+        }
+      } catch(err) {
+        console.error('Error loading branch claims:', err);
+      }
+    });
+  </script>
+</body>
+</html>

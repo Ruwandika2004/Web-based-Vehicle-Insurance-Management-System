@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Claim | SafeRide Insurance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=7">
+  <link rel="stylesheet" href="/css/dashboard.css?v=7">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+        SafeRide <span>Insurance</span>
+      </a>
+      <div class="nav-actions">
+        <span id="navUserName" style="font-weight: 600; color: var(--gray-700);"></span>
+        <button class="btn btn-sm btn-secondary" onclick="API.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <!-- Sidebar — dynamically built by API.initPortal() -->
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div style="font-weight: 700;" id="sidebarUserFullName">Loading...</div>
+        <div class="form-text" id="sidebarUserEmail">...</div>
+        <span class="user-role-badge" id="sidebarRoleBadge"></span>
+      </div>
+      <ul class="sidebar-menu" id="sidebarMenu"></ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <div class="page-title">
+          <h1>First Notice of Loss (FNOL) & Claim Submission</h1>
+          <p>Instant digital claim intake, automated coverage verification, and roadside incident intake.</p>
+        </div>
+      </div>
+
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-file-shield" style="color: var(--danger);"></i> Incident & Loss Verification</div>
+            <span class="badge badge-success"><i class="fas fa-shield-check"></i> Digital Intake Active</span>
+          </div>
+
+          <form id="claimSubmitForm">
+            <div class="form-group">
+              <label class="form-label">Active Insurance Policy</label>
+              <select class="form-select" id="claimPolicy" required>
+                <option value="">-- Select Active Policy --</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Nature of Claim (Incident Type)</label>
+                <select class="form-select" id="claimType" required>
+                  <option value="ACCIDENT">Road Traffic Accident / Collision</option>
+                  <option value="THEFT">Vehicle / Accessories Theft</option>
+                  <option value="WINDSCREEN">Windscreen / Glass Breakage</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date of Incident</label>
+                <input type="date" class="form-control" id="incidentDate" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Exact Location of Incident</label>
+              <input type="text" class="form-control" id="incidentLocation" placeholder="e.g. Galle Road, Bambalapitiya Junction" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Estimated Damage Amount (LKR)</label>
+              <input type="number" class="form-control" id="estimatedDamage" placeholder="e.g. 75000" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Comprehensive Incident Description</label>
+              <textarea class="form-control" id="incidentDescription" rows="3" placeholder="Provide full details of how the accident or damage occurred..." required></textarea>
+            </div>
+
+            <!-- Accident specific inputs -->
+            <div id="accidentFields">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Driver Name at Incident</label>
+                  <input type="text" class="form-control" id="driverName" placeholder="Name of driver">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Collision Type</label>
+                  <select class="form-select" id="collisionType">
+                    <option value="HEAD_ON">Head-on Collision</option>
+                    <option value="REAR_END">Rear-end Collision</option>
+                    <option value="SIDE_IMPACT">Side Impact / T-Bone</option>
+                    <option value="SINGLE_VEHICLE">Single Vehicle / Stationary Object</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Police Report / Entry Number</label>
+                  <input type="text" class="form-control" id="policeReportNo" placeholder="PR-XXXX-YYYY">
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; margin-top: 1.8rem;">
+                  <label><input type="checkbox" id="thirdPartyInvolved"> Third-Party Vehicle Involved</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Theft specific inputs -->
+            <div id="theftFields" style="display: none;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Police Station Reported</label>
+                  <input type="text" class="form-control" id="theftPoliceStation" placeholder="e.g. Colombo Central Station">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Crime Reference Number</label>
+                  <input type="text" class="form-control" id="theftCrimeRef" placeholder="CR-XXXX-YYYY">
+                </div>
+              </div>
+            </div>
+
+            <!-- Windscreen specific inputs -->
+            <div id="windscreenFields" style="display: none;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Glass Location</label>
+                  <select class="form-select" id="glassType">
+                    <option value="FRONT_WINDSCREEN">Front Windshield</option>
+                    <option value="REAR_WINDSCREEN">Rear Windshield</option>
+                    <option value="SIDE_WINDOW">Side Window Glass</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Preferred Repair Center</label>
+                  <input type="text" class="form-control" id="workshopName" placeholder="e.g. Toyota Lanka / Auto Mirage">
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 2rem; border-top: 1px solid var(--gray-200); padding-top: 1.25rem;">
+              <button type="submit" class="btn btn-danger btn-lg"><i class="fas fa-paper-plane"></i> Submit Insurance Claim</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/api.js?v=7"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = API.initPortal();
+      if (!user) return;
+
+      document.getElementById('driverName').value = user.fullName;
+      document.getElementById('incidentDate').value = new Date().toISOString().split('T')[0];
+
+      const claimTypeSelect = document.getElementById('claimType');
+      claimTypeSelect.addEventListener('change', () => {
+        const val = claimTypeSelect.value;
+        document.getElementById('accidentFields').style.display = (val === 'ACCIDENT') ? 'block' : 'none';
+        document.getElementById('theftFields').style.display = (val === 'THEFT') ? 'block' : 'none';
+        document.getElementById('windscreenFields').style.display = (val === 'WINDSCREEN') ? 'block' : 'none';
+      });
+
+      // Load active customer policies
+      try {
+        const res = await API.request('/policies/customer/' + user.id);
+        const policies = (res.data || []).filter(p => p.status === 'ACTIVE' || p.status === 'RENEWED');
+        const select = document.getElementById('claimPolicy');
+        
+        if (policies.length === 0) {
+          select.innerHTML = '<option value="">No Active Policies Available (Please issue a policy first)</option>';
+        } else {
+          select.innerHTML = '<option value="">-- Select Active Policy --</option>' +
+            policies.map(p => `<option value="${p.id}">${p.policyNumber} - ${p.vehicle ? p.vehicle.registrationNumber + ' (' + p.vehicle.make + ')' : 'Vehicle'} [Cover: ${API.formatLKR(p.sumInsured)}]</option>`).join('');
+        }
+      } catch (e) {}
+
+      // Handle Claim Submit
+      document.getElementById('claimSubmitForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const policyId = document.getElementById('claimPolicy').value;
+        if (!policyId) {
+          API.toast('Please select an active policy', 'warning');
+          return;
+        }
+
+        const payload = {
+          customerId: user.id,
+          policyId: parseInt(policyId),
+          claimType: document.getElementById('claimType').value,
+          incidentDate: document.getElementById('incidentDate').value,
+          incidentLocation: document.getElementById('incidentLocation').value.trim(),
+          incidentDescription: document.getElementById('incidentDescription').value.trim(),
+          estimatedDamageAmount: parseFloat(document.getElementById('estimatedDamage').value),
+          driverNameAtIncident: document.getElementById('driverName').value.trim(),
+          collisionType: document.getElementById('collisionType').value,
+          policeReportNumber: document.getElementById('policeReportNo').value.trim(),
+          thirdPartyVehicleInvolved: document.getElementById('thirdPartyInvolved').checked,
+          policeStationReported: document.getElementById('theftPoliceStation').value.trim(),
+          crimeReferenceNumber: document.getElementById('theftCrimeRef').value.trim(),
+          glassType: document.getElementById('glassType').value,
+          repairWorkshopName: document.getElementById('workshopName').value.trim()
+        };
+
+        try {
+          const res = await API.request('/claims', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+          API.toast('Insurance claim filed successfully! Reference: ' + res.data.claimReference, 'success');
+          setTimeout(() => {
+            window.location.href = '/claim-track.html';
+          }, 1200);
+        } catch (err) {}
+      });
+    });
+  </script>
+</body>
+</html>
+
+

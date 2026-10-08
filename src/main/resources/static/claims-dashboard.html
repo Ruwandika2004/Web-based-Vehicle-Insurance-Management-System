@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claims Operations Command Centre | SafeRide Insurance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=7">
+  <link rel="stylesheet" href="/css/dashboard.css?v=7">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+        SafeRide <span>Insurance</span>
+      </a>
+      <div class="nav-actions">
+        <span id="navUserName" style="font-weight: 600; color: var(--gray-700);"></span>
+        <button class="btn btn-sm btn-secondary" onclick="API.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <!-- Sidebar — dynamically built by API.initPortal() -->
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div style="font-weight: 700;" id="sidebarUserFullName">Loading...</div>
+        <div class="form-text" id="sidebarUserEmail">...</div>
+        <span class="user-role-badge" id="sidebarRoleBadge"></span>
+      </div>
+      <ul class="sidebar-menu" id="sidebarMenu"></ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <div class="page-title">
+          <h1>Claims Operations Command Centre</h1>
+          <p>Real-time oversight of all claim submissions, assessment queues, and settlement pipelines.</p>
+        </div>
+        <div>
+          <a href="/claim-manage.html" class="btn btn-primary"><i class="fas fa-gavel"></i> Open Adjudication Queue</a>
+        </div>
+      </div>
+
+      <!-- KPI Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="fas fa-inbox"></i></div>
+          <div class="stat-info">
+            <h4>Pending Desk Review</h4>
+            <div class="stat-value" id="statPending">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-microscope"></i></div>
+          <div class="stat-info">
+            <h4>Under Assessment</h4>
+            <div class="stat-value" id="statUnderReview">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="fas fa-car-burst"></i></div>
+          <div class="stat-info">
+            <h4>Inspection Booked</h4>
+            <div class="stat-value" id="statInspection">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-circle-check"></i></div>
+          <div class="stat-info">
+            <h4>Approved / Settled</h4>
+            <div class="stat-value" id="statApproved">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Modules -->
+      <h3 style="margin-bottom: 1rem;"><i class="fas fa-bolt" style="color: var(--accent);"></i> Quick Access</h3>
+      <div class="actions-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem;">
+        <a href="/claim-manage.html" class="action-tile">
+          <i class="fas fa-gavel"></i>
+          <strong>Adjudication Queue</strong>
+          <span class="form-text">Review &amp; action pending claims</span>
+        </a>
+        <a href="/inspection-management.html" class="action-tile">
+          <i class="fas fa-clipboard-check"></i>
+          <strong>Technical Inspections</strong>
+          <span class="form-text">Schedule &amp; review damage assessments</span>
+        </a>
+      </div>
+
+      <!-- Recent Claims Preview -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-list-ul" style="color: var(--primary-light);"></i> Live Claims Queue &mdash; Latest Submissions</div>
+          <a href="/claim-manage.html" class="btn btn-sm btn-secondary">Full Queue <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Claim Reference</th>
+                <th>Type</th>
+                <th>Claimant</th>
+                <th>Incident Date</th>
+                <th>Claimed Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recentClaimsTbody">
+              <tr><td colspan="6" style="text-align: center;">Loading claims data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Claims Status Breakdown -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-chart-pie" style="color: var(--primary-light);"></i> Claim Resolution Breakdown</div>
+          </div>
+          <div style="padding: 1rem 1.5rem;">
+            <div style="margin-bottom: 1.2rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+                <span style="font-size: 0.875rem; font-weight: 600;">Approved / Settled</span>
+                <span id="pctApproved" style="font-size: 0.875rem; color: #10b981; font-weight: 700;">—</span>
+              </div>
+              <div style="background: #e5e7eb; border-radius: 8px; height: 8px;">
+                <div id="barApproved" style="background: #10b981; width: 0%; height: 8px; border-radius: 8px; transition: width 0.8s ease;"></div>
+              </div>
+            </div>
+            <div style="margin-bottom: 1.2rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+                <span style="font-size: 0.875rem; font-weight: 600;">Under Review / Inspection</span>
+                <span id="pctReview" style="font-size: 0.875rem; color: #f59e0b; font-weight: 700;">—</span>
+              </div>
+              <div style="background: #e5e7eb; border-radius: 8px; height: 8px;">
+                <div id="barReview" style="background: #f59e0b; width: 0%; height: 8px; border-radius: 8px; transition: width 0.8s ease;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+                <span style="font-size: 0.875rem; font-weight: 600;">Pending Desk Review</span>
+                <span id="pctPending" style="font-size: 0.875rem; color: #3b82f6; font-weight: 700;">—</span>
+              </div>
+              <div style="background: #e5e7eb; border-radius: 8px; height: 8px;">
+                <div id="barPending" style="background: #3b82f6; width: 0%; height: 8px; border-radius: 8px; transition: width 0.8s ease;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-bolt" style="color: var(--accent);"></i> Officer Quick Actions</div>
+          </div>
+          <div style="padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+            <a href="/claim-manage.html" class="btn btn-primary" style="justify-content: flex-start; gap: 0.75rem;">
+              <i class="fas fa-gavel"></i> Open Claims Adjudication Queue
+            </a>
+            <a href="/inspection-management.html" class="btn btn-secondary" style="justify-content: flex-start; gap: 0.75rem;">
+              <i class="fas fa-clipboard-check"></i> Vehicle Damage Inspection Desk
+            </a>
+            <button class="btn btn-secondary" style="justify-content: flex-start; gap: 0.75rem;" onclick="API.toast('Filter by PENDING status in the Adjudication Queue.', 'info')">
+              <i class="fas fa-hourglass-half"></i> View Pending Claims Only
+            </button>
+            <button class="btn btn-secondary" style="justify-content: flex-start; gap: 0.75rem;" onclick="API.toast('Inspection scheduling available in the Inspection Desk.', 'info')">
+              <i class="fas fa-calendar-plus"></i> Schedule New Inspection
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/api.js?v=7"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = API.initPortal();
+      if (!user) return;
+
+      try {
+        const res = await API.request('/claims');
+        const claims = res.data || [];
+        const total = claims.length;
+
+        const pending     = claims.filter(c => c.status === 'SUBMITTED').length;
+        const underReview = claims.filter(c => c.status === 'UNDER_REVIEW').length;
+        const inspection  = claims.filter(c => c.status === 'INSPECTION_SCHEDULED').length;
+        const approved    = claims.filter(c => c.status === 'APPROVED' || c.status === 'SETTLED').length;
+
+        document.getElementById('statPending').textContent    = pending;
+        document.getElementById('statUnderReview').textContent = underReview;
+        document.getElementById('statInspection').textContent = inspection;
+        document.getElementById('statApproved').textContent   = approved;
+
+        // Progress bars
+        if (total > 0) {
+          const setPct = (barId, pctId, count) => {
+            const pct = Math.round((count / total) * 100);
+            document.getElementById(barId).style.width = pct + '%';
+            document.getElementById(pctId).textContent = pct + '%';
+          };
+          setPct('barApproved', 'pctApproved', approved);
+          setPct('barReview',   'pctReview',   underReview + inspection);
+          setPct('barPending',  'pctPending',  pending);
+        }
+
+        // Recent claims table
+        const tbody = document.getElementById('recentClaimsTbody');
+        if (claims.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--gray-500);">No claims in the system yet.</td></tr>';
+        } else {
+          tbody.innerHTML = claims.slice(0, 6).map(c => {
+            const badgeCls = (c.status === 'APPROVED' || c.status === 'SETTLED') ? 'success'
+                           : c.status === 'REJECTED' ? 'danger'
+                           : c.status === 'UNDER_REVIEW' ? 'warning' : 'secondary';
+            return `
+              <tr>
+                <td><strong>${c.claimReference}</strong></td>
+                <td>${c.claimType}</td>
+                <td>${c.customer ? c.customer.fullName : 'N/A'}</td>
+                <td>${c.incidentDate}</td>
+                <td>${API.formatLKR(c.estimatedDamageAmount || c.claimedAmount || 0)}</td>
+                <td><span class="badge badge-${badgeCls}">${c.status.replace(/_/g, ' ')}</span></td>
+              </tr>`;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Claims load error:', err);
+      }
+    });
+  </script>
+</body>
+</html>
+
+

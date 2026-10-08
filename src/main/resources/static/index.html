@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeRide Insurance | Enterprise Portal Sign In</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=7">
+  <link rel="stylesheet" href="/css/auth.css?v=5">
+</head>
+<body class="auth-body">
+
+  <div class="auth-page">
+    <!-- LEFT VISUAL AREA (Video-Dominant Desktop) - Cinematic Journey & Mobility Scene -->
+    <section class="auth-visual" aria-label="SafeRide Brand Experience">
+      <!-- 1. Ambient Visual Fallback Layer (SVG/CSS road animation) -->
+      <div class="auth-visual-backdrop" aria-hidden="true">
+        <div class="auth-ambient-grid"></div>
+
+        <!-- Abstract Road & Telemetry SVG Scene -->
+        <svg class="auth-visual-svg" viewBox="0 0 800 500" preserveAspectRatio="none">
+          <defs>
+            <!-- Horizon Soft Glow -->
+            <radialGradient id="horizonGlow" cx="50%" cy="22%" r="48%">
+              <stop offset="0%" stop-color="#6CCFD1" stop-opacity="0.22" />
+              <stop offset="50%" stop-color="#2A9D8F" stop-opacity="0.08" />
+              <stop offset="100%" stop-color="#0F2236" stop-opacity="0" />
+            </radialGradient>
+            
+            <!-- Left Vehicle Tail-Light Stream -->
+            <linearGradient id="tailLightGrad" x1="50%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#D9534F" stop-opacity="0" />
+              <stop offset="50%" stop-color="#D9534F" stop-opacity="0.35" />
+              <stop offset="100%" stop-color="#D9534F" stop-opacity="0.8" />
+            </linearGradient>
+
+            <!-- Right Vehicle Head-Light Stream -->
+            <linearGradient id="headLightGrad" x1="50%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6CCFD1" stop-opacity="0" />
+              <stop offset="50%" stop-color="#2A9D8F" stop-opacity="0.35" />
+              <stop offset="100%" stop-color="#6CCFD1" stop-opacity="0.75" />
+            </linearGradient>
+
+            <!-- Road Surface -->
+            <linearGradient id="roadSurface" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#0A1624" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#12273D" stop-opacity="0.75" />
+            </linearGradient>
+          </defs>
+
+          <!-- Ambient Horizon Halo -->
+          <ellipse cx="400" cy="115" rx="360" ry="95" fill="url(#horizonGlow)" />
+
+          <!-- Watermark Insurance Shield -->
+          <g class="auth-shield-watermark" opacity="0.07" transform="translate(355, 15)">
+            <path d="M45 0 L85 16 V50 C85 78 45 98 45 98 C45 98 5 78 5 50 V16 Z" fill="none" stroke="#6CCFD1" stroke-width="2" />
+            <path d="M45 18 L72 29 V50 C72 68 45 84 45 84 C45 84 18 68 18 50 V29 Z" fill="#2A9D8F" fill-opacity="0.2" />
+          </g>
+
+          <!-- Road Trapeze -->
+          <polygon points="375,115 425,115 760,500 40,500" fill="url(#roadSurface)" />
+
+          <!-- Road Boundaries -->
+          <line x1="375" y1="115" x2="40" y2="500" stroke="#1E4265" stroke-width="1.5" />
+          <line x1="425" y1="115" x2="760" y2="500" stroke="#1E4265" stroke-width="1.5" />
+
+          <!-- Animated Road Lane Dividers -->
+          <line class="auth-animated-lane" x1="400" y1="115" x2="400" y2="500" stroke="#6CCFD1" stroke-width="2.5" stroke-dasharray="16, 24" stroke-opacity="0.8" />
+          <line class="auth-animated-lane" x1="388" y1="115" x2="220" y2="500" stroke="#64748B" stroke-width="1" stroke-dasharray="12, 28" stroke-opacity="0.35" />
+          <line class="auth-animated-lane" x1="412" y1="115" x2="580" y2="500" stroke="#64748B" stroke-width="1" stroke-dasharray="12, 28" stroke-opacity="0.35" />
+
+          <!-- Vehicle Light Trails -->
+          <path class="auth-light-trail-left" d="M380,118 Q280,290 130,500" fill="none" stroke="url(#tailLightGrad)" stroke-width="2.8" stroke-linecap="round" />
+          <path class="auth-light-trail-right" d="M420,118 Q520,290 670,500" fill="none" stroke="url(#headLightGrad)" stroke-width="2.8" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <!-- 2. Cinematic SafeRide Login Journey Background Video (z-index: 1) -->
+      <video 
+        class="auth-visual-video" 
+        id="authBgVideo"
+        src="/video/saferide-login-journey.mp4"
+        autoplay 
+        muted 
+        loop 
+        playsinline 
+        preload="metadata" 
+        aria-hidden="true"
+      >
+        <source src="/video/saferide-login-journey.mp4" type="video/mp4">
+      </video>
+
+      <!-- 3. SafeRide Dark Navy Overlay for Crisp Foreground Contrast -->
+      <div class="auth-visual-overlay" aria-hidden="true"></div>
+
+      <!-- 4. Top Brand Identity Header (Foreground z-index: 3) -->
+      <header class="auth-visual-header">
+        <a href="/" class="auth-brand-link" title="SafeRide Home">
+          <div class="auth-brand-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="auth-brand-text">SafeRide <span>Insurance</span></div>
+        </a>
+        <div class="auth-system-badge">Vehicle Insurance Platform</div>
+      </header>
+
+      <!-- 5. Center / Bottom Brand Content (Foreground z-index: 3) -->
+      <div class="auth-visual-content">
+        <h2 class="auth-visual-title">Protection for every journey.</h2>
+        <p class="auth-visual-desc">
+          Manage vehicles, policies, claims and insurance operations through one secure platform.
+        </p>
+
+        <!-- Refined Capability & Trust Indicators -->
+        <div class="auth-trust-pills">
+          <div class="auth-trust-pill">
+            <i class="fas fa-shield-alt"></i>
+            <span>Secure Access</span>
+          </div>
+          <div class="auth-trust-pill">
+            <i class="fas fa-file-contract"></i>
+            <span>Policy Management</span>
+          </div>
+          <div class="auth-trust-pill">
+            <i class="fas fa-clipboard-check"></i>
+            <span>Claims Processing</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT AUTHENTICATION AREA (Controlled Desktop Width) -->
+    <main class="auth-panel">
+      <!-- Upper-Right Compact Theme Toggle (38x38px) -->
+      <button 
+        type="button" 
+        class="auth-theme-toggle theme-toggle-btn" 
+        id="themeToggleBtn" 
+        onclick="API.toggleTheme()" 
+        aria-label="Switch to dark mode"
+        title="Switch to dark mode"
+      >
+        <i class="fas fa-moon" id="themeToggleIcon"></i>
+      </button>
+
+      <div class="auth-container">
+        
+        <!-- Mobile Header (Visible on viewport < 768px) -->
+        <div class="auth-mobile-header">
+          <div class="auth-brand-link" style="color: #16324F; justify-content: center;">
+            <div class="auth-brand-icon" style="box-shadow: none;">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="auth-brand-text" style="color: #16324F;">SafeRide <span style="color: #2A9D8F;">Insurance</span></div>
+          </div>
+        </div>
+
+        <!-- Section Heading -->
+        <div class="auth-header">
+          <h1 class="auth-title">Welcome back</h1>
+          <p class="auth-subtitle">Sign in to access your SafeRide workspace.</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form" novalidate>
+          <!-- Semantic Danger Alert for Authentication Failures -->
+          <div class="auth-error-alert" id="loginError" style="display: none;" role="alert">
+            <i class="fas fa-circle-exclamation"></i>
+            <span id="loginErrorText">Invalid credentials. Please verify your details.</span>
+          </div>
+
+          <!-- Username / Email Field -->
+          <div class="auth-field">
+            <label for="loginUsername" class="auth-label">Username or Email</label>
+            <div class="auth-input-group">
+              <i class="fas fa-user auth-input-icon"></i>
+              <input 
+                type="text" 
+                class="auth-input" 
+                id="loginUsername" 
+                name="username"
+                placeholder="Enter your username or email" 
+                required 
+                autocomplete="username"
+              >
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="auth-field">
+            <label for="loginPassword" class="auth-label">Password</label>
+            <div class="auth-input-group">
+              <i class="fas fa-lock auth-input-icon"></i>
+              <input 
+                type="password" 
+                class="auth-input" 
+                id="loginPassword" 
+                name="password"
+                placeholder="••••••••••••" 
+                required 
+                autocomplete="current-password"
+              >
+              <button 
+                type="button" 
+                class="auth-password-toggle" 
+                id="togglePasswordBtn" 
+                onclick="togglePasswordVisibility()" 
+                aria-label="Toggle password visibility"
+              >
+                <i class="fas fa-eye" id="togglePwdIcon"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Primary Submit Button -->
+          <button type="submit" class="auth-btn-primary" id="loginSubmitBtn">
+            <i class="fas fa-arrow-right-to-bracket"></i> Sign In Securely
+          </button>
+        </form>
+
+        <!-- Customer Registration Entry Point -->
+        <div class="auth-register-prompt">
+          New to SafeRide?
+          <button type="button" class="auth-link-btn btn-open-register" onclick="openRegisterModal()">
+            Create an account
+          </button>
+        </div>
+
+        <!-- Collapsible Developer / Evaluation Accounts Drawer -->
+        <div class="auth-demo-section">
+          <button 
+            type="button" 
+            class="auth-demo-toggle-btn" 
+            id="demoToggleBtn" 
+            onclick="toggleDemoDrawer()" 
+            aria-expanded="false"
+            aria-controls="demoDrawer"
+          >
+            <span>
+              <i class="fas fa-laptop-code" style="color: #2A9D8F; margin-right: 0.45rem;"></i>
+              Demo & Evaluation Accounts
+            </span>
+            <i class="fas fa-chevron-down demo-chevron" id="demoChevron"></i>
+          </button>
+
+          <div class="auth-demo-drawer" id="demoDrawer" style="display: none;">
+            <div class="auth-role-pills">
+              <button type="button" class="auth-role-pill active" id="pillCustomer" onclick="selectRole('CUSTOMER')">
+                <i class="fas fa-user"></i> Customer
+              </button>
+              <button type="button" class="auth-role-pill" id="pillStaff" onclick="selectRole('STAFF')">
+                <i class="fas fa-shield-alt"></i> Operations Staff
+              </button>
+            </div>
+            <div class="auth-demo-chips" id="sandboxChips"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Grounded Enterprise Footer with WCAG AA Compliant Contrast -->
+      <footer class="auth-panel-footer">
+        SafeRide Enterprise Vehicle Insurance Management System &bull; Secure Multi-Portal Access
+      </footer>
+    </main>
+  </div>
+
+  <!-- Structured Customer Registration Modal -->
+  <div class="auth-modal-backdrop" id="registerModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="auth-modal-dialog">
+      <!-- Modal Header -->
+      <div class="auth-modal-header">
+        <div class="auth-modal-title">
+          <i class="fas fa-user-plus"></i>
+          <div>
+            <h3 id="modalTitle">Create Customer Account</h3>
+            <p>Initialize your policyholder profile & online account</p>
+          </div>
+        </div>
+        <button type="button" class="auth-modal-close" onclick="closeRegisterModal()" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <!-- Registration Form (Dual IDs regForm and customerRegisterForm for 100% script compatibility) -->
+      <form id="customerRegisterForm" class="auth-modal-body" novalidate>
+        
+        <div class="auth-form-notice">
+          <i class="fas fa-circle-info"></i>
+          <span>Registering will create your secure portal login and initialize your official KYC policyholder profile.</span>
+        </div>
+
+        <!-- Section 1: Account Credentials -->
+        <div class="auth-form-section-title">
+          <i class="fas fa-key"></i> 1. Account Credentials
+        </div>
+
+        <div class="auth-form-row">
+          <div class="auth-field">
+            <label for="regFullName" class="auth-label">Full Legal Name</label>
+            <input type="text" class="auth-input" id="regFullName" placeholder="e.g. Sunil Fernando" required>
+          </div>
+          <div class="auth-field">
+            <label for="regUsername" class="auth-label">Username</label>
+            <input type="text" class="auth-input" id="regUsername" placeholder="e.g. sunil_fernando" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="auth-form-row">
+          <div class="auth-field">
+            <label for="regEmail" class="auth-label">Email Address</label>
+            <input type="email" class="auth-input" id="regEmail" placeholder="sunil@example.com" required autocomplete="email">
+          </div>
+          <div class="auth-field">
+            <label for="regPassword" class="auth-label">Password</label>
+            <input type="password" class="auth-input" id="regPassword" placeholder="Minimum 6 characters" required autocomplete="new-password">
+          </div>
+        </div>
+
+        <!-- Section 2: Identity & Contact (KYC) -->
+        <div class="auth-form-section-title">
+          <i class="fas fa-id-card"></i> 2. Identity & Contact Information (KYC)
+        </div>
+
+        <div class="auth-form-row">
+          <div class="auth-field">
+            <label for="regNic" class="auth-label">NIC / Passport Number</label>
+            <input type="text" class="auth-input" id="regNic" placeholder="e.g. 198812304567 or 881234567V" required>
+          </div>
+          <div class="auth-field">
+            <label for="regLicense" class="auth-label">Driving License Number</label>
+            <input type="text" class="auth-input" id="regLicense" placeholder="e.g. B8849201" required>
+          </div>
+        </div>
+
+        <div class="auth-form-row">
+          <div class="auth-field">
+            <label for="regPhone" class="auth-label">Mobile Phone Number</label>
+            <input type="tel" class="auth-input" id="regPhone" placeholder="+94771234567" required autocomplete="tel">
+          </div>
+          <div class="auth-field">
+            <label for="regCity" class="auth-label">City</label>
+            <input type="text" class="auth-input" id="regCity" placeholder="Colombo" required>
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label for="regAddress" class="auth-label">Residential Address</label>
+          <input type="text" class="auth-input" id="regAddress" placeholder="45/2 Temple Road, Colombo 07" required>
+        </div>
+
+        <!-- Hidden regRole fallback for auth.js compatibility -->
+        <input type="hidden" id="regRole" value="ROLE_CUSTOMER">
+
+        <!-- Modal Footer Actions -->
+        <div class="auth-modal-footer">
+          <button type="button" class="auth-btn-secondary btn-modal-close" onclick="closeRegisterModal()">Cancel</button>
+          <button type="submit" class="auth-btn-primary" id="btnSubmitRegister" style="width: auto; padding: 0 1.5rem; margin-top: 0;">
+            <i class="fas fa-check"></i> Complete Customer Registration
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js?v=7"></script>
+  <script>
+    let activeRole = 'CUSTOMER';
+
+    // SafeRide Cinematic Video Diagnostics & Error Handling
+    const bgVideo = document.getElementById('authBgVideo');
+    if (bgVideo) {
+      function logVideoState(stage) {
+        console.log(`[SafeRide Video Diagnostics - ${stage}]`, {
+          currentSrc: bgVideo.currentSrc,
+          readyState: bgVideo.readyState,
+          networkState: bgVideo.networkState,
+          error: bgVideo.error ? { code: bgVideo.error.code, message: bgVideo.error.message } : null,
+          paused: bgVideo.paused
+        });
+      }
+
+      // Initial diagnostics
+      logVideoState('init');
+
+      bgVideo.addEventListener('loadedmetadata', () => logVideoState('loadedmetadata'));
+      bgVideo.addEventListener('canplay', () => {
+        logVideoState('canplay');
+        // Ensure play promise is invoked
+        bgVideo.play().catch(err => {
+          console.warn('[SafeRide Video] Autoplay prevented by browser policy:', err);
+        });
+      });
+      bgVideo.addEventListener('playing', () => logVideoState('playing'));
+
+      // Do NOT hide the video unless a real media error occurs
+      bgVideo.addEventListener('error', () => {
+        logVideoState('error');
+        if (bgVideo.error) {
+          console.error('[SafeRide Video] Genuine media error detected:', bgVideo.error);
+          bgVideo.style.display = 'none';
+        }
+      });
+    }
+
+    const rolePresets = {
+      CUSTOMER: [
+        { name: 'Sunil Fernando (Customer)', user: 'customer_sunil', pass: 'customer123', icon: 'fa-user' },
+        { name: 'Anusha De Silva (Customer)', user: 'customer_anusha', pass: 'customer123', icon: 'fa-user' }
+      ],
+      STAFF: [
+        { name: 'Kamal Perera (Insurance Agent)', user: 'agent_kamal', pass: 'agent123', icon: 'fa-user-tie' },
+        { name: 'Nimal Silva (Claims Officer)', user: 'officer_nimal', pass: 'officer123', icon: 'fa-gavel' },
+        { name: 'Priya Fernando (Finance Officer)', user: 'finance_priya', pass: 'finance123', icon: 'fa-sack-dollar' },
+        { name: 'Rohan Wickrama (Branch Manager)', user: 'manager_rohan', pass: 'manager123', icon: 'fa-chart-bar' },
+        { name: 'Ranil Wickramasinghe (Admin)', user: 'admin', pass: 'admin123', icon: 'fa-shield-alt' }
+      ]
+    };
+
+    function selectRole(roleKey) {
+      activeRole = roleKey;
+      const pillCustomer = document.getElementById('pillCustomer');
+      const pillStaff = document.getElementById('pillStaff');
+      if (pillCustomer) pillCustomer.className = 'auth-role-pill' + (roleKey === 'CUSTOMER' ? ' active' : '');
+      if (pillStaff) pillStaff.className = 'auth-role-pill' + (roleKey === 'STAFF' ? ' active' : '');
+
+      const chips = rolePresets[roleKey] || [];
+      const chipsContainer = document.getElementById('sandboxChips');
+      if (chipsContainer) {
+        chipsContainer.innerHTML = chips.map(c => `
+          <button type="button" class="auth-demo-chip" onclick="quickFill('${c.user}', '${c.pass}')">
+            <span class="auth-demo-chip-name"><i class="fas ${c.icon}"></i> ${c.name}</span>
+            <span class="auth-demo-chip-user">${c.user}</span>
+          </button>
+        `).join('');
+      }
+    }
+
+    function quickFill(user, pass) {
+      const uField = document.getElementById('loginUsername');
+      const pField = document.getElementById('loginPassword');
+      if (uField) uField.value = user;
+      if (pField) pField.value = pass;
+      hideLoginError();
+    }
+
+    function toggleDemoDrawer() {
+      const drawer = document.getElementById('demoDrawer');
+      const chevron = document.getElementById('demoChevron');
+      const btn = document.getElementById('demoToggleBtn');
+      if (!drawer) return;
+
+      const isHidden = drawer.style.display === 'none';
+      drawer.style.display = isHidden ? 'block' : 'none';
+      if (chevron) {
+        chevron.classList.toggle('rotated', isHidden);
+      }
+      if (btn) {
+        btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+      }
+    }
+
+    function togglePasswordVisibility() {
+      const pwdInput = document.getElementById('loginPassword');
+      const icon = document.getElementById('togglePwdIcon');
+      if (!pwdInput) return;
+
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        if (icon) icon.className = 'fas fa-eye-slash';
+      } else {
+        pwdInput.type = 'password';
+        if (icon) icon.className = 'fas fa-eye';
+      }
+    }
+
+    function openRegisterModal() {
+      const modal = document.getElementById('registerModal');
+      if (modal) modal.classList.add('show');
+    }
+
+    function closeRegisterModal() {
+      const modal = document.getElementById('registerModal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    function showLoginError(msg) {
+      const errBox = document.getElementById('loginError');
+      const errText = document.getElementById('loginErrorText');
+      if (errBox) {
+        errBox.style.display = 'flex';
+        if (errText) errText.textContent = msg || 'Invalid credentials. Please verify your details.';
+      }
+    }
+
+    function hideLoginError() {
+      const errBox = document.getElementById('loginError');
+      if (errBox) errBox.style.display = 'none';
+    }
+
+    // Modal close when clicking outside backdrop
+    window.addEventListener('click', (e) => {
+      const modal = document.getElementById('registerModal');
+      if (modal && e.target === modal) {
+        closeRegisterModal();
+      }
+    });
+
+    // Login Form Submission
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideLoginError();
+
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const submitBtn = document.getElementById('loginSubmitBtn');
+      
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+
+      try {
+        const res = await API.login(username, password);
+        API.toast('Authentication successful! Welcome, ' + res.data.fullName, 'success');
+        
+        setTimeout(() => {
+          const roleRedirect = {
+            'ROLE_CUSTOMER':        '/customer-dashboard.html',
+            'ROLE_INSURANCE_AGENT': '/agent-dashboard.html',
+            'ROLE_CLAIMS_OFFICER':  '/claims-dashboard.html',
+            'ROLE_FINANCE_OFFICER': '/finance-dashboard.html',
+            'ROLE_BRANCH_MANAGER':  '/branch-dashboard.html',
+            'ROLE_ADMIN':           '/admin-dashboard.html',
+          };
+          window.location.href = roleRedirect[res.data.role] || '/customer-dashboard.html';
+        }, 500);
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        const msg = err.message || 'Sign in failed. Please check your credentials.';
+        showLoginError(msg);
+        API.toast(msg, 'error');
+      }
+    });
+
+    // Customer Registration Form Submission
+    const regFormHandler = async (e) => {
+      e.preventDefault();
+      const regBtn = document.getElementById('btnSubmitRegister');
+      const originalText = regBtn.innerHTML;
+      regBtn.disabled = true;
+      regBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account & Profile...';
+
+      const payload = {
+        fullName: document.getElementById('regFullName').value.trim(),
+        username: document.getElementById('regUsername').value.trim(),
+        email: document.getElementById('regEmail').value.trim(),
+        password: document.getElementById('regPassword').value,
+        phone: document.getElementById('regPhone').value.trim(),
+        nicPassport: document.getElementById('regNic').value.trim(),
+        drivingLicenseNo: document.getElementById('regLicense') ? document.getElementById('regLicense').value.trim() : null,
+        city: document.getElementById('regCity') ? document.getElementById('regCity').value.trim() : null,
+        residentialAddress: document.getElementById('regAddress') ? document.getElementById('regAddress').value.trim() : null,
+        role: 'ROLE_CUSTOMER'
+      };
+
+      try {
+        const res = await API.register(payload);
+        API.toast('Customer account & profile successfully registered!', 'success');
+        closeRegisterModal();
+        setTimeout(() => {
+          window.location.href = '/customer-dashboard.html';
+        }, 700);
+      } catch (err) {
+        regBtn.disabled = false;
+        regBtn.innerHTML = originalText;
+        API.toast('Registration error: ' + (err.message || 'Please verify form fields'), 'error');
+      }
+    };
+
+    const regForm = document.getElementById('customerRegisterForm');
+    if (regForm) {
+      regForm.addEventListener('submit', regFormHandler);
+    }
+
+    // Initialize with Customer selection
+    selectRole('CUSTOMER');
+  </script>
+</body>
+</html>

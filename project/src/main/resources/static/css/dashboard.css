@@ -1,0 +1,204 @@
+/* ==========================================================================
+   SafeRide Portal Shell — SaaS Product Layout v4
+   Dark app-rail sidebar + light/dark-aware content area (Linear/Vercel style)
+   All selectors identical to the original — no HTML changes needed.
+   ========================================================================== */
+
+.app-layout {
+  display: flex;
+  min-height: calc(100vh - 57px);
+  background-color: var(--slate-50);
+}
+
+/* ==========================================================================
+   Sidebar Navigation — fixed dark shell, always-on brand surface
+   ========================================================================== */
+.sidebar {
+  width: 264px;
+  background: var(--shell-bg);
+  border-right: 1px solid var(--shell-border);
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.sidebar-user {
+  padding: 1rem;
+  background: var(--shell-bg-alt);
+  border-radius: var(--radius);
+  border: 1px solid var(--shell-border);
+  margin-bottom: 1.25rem;
+}
+
+.sidebar-user-name,
+.sidebar-user > div[style] {
+  font-weight: 700 !important;
+  font-size: 0.92rem;
+  color: #f2f2f7 !important;
+  margin-bottom: 0.1rem;
+}
+
+.sidebar-user-email,
+.sidebar-user .form-text {
+  font-size: 0.76rem !important;
+  color: var(--shell-text-dim) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: var(--radius-full);
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  filter: saturate(1.4);
+}
+
+.sidebar-heading {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--shell-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.5rem 0.75rem 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; }
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+  color: var(--shell-text);
+  font-weight: 500;
+  font-size: 0.87rem;
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+.sidebar-link i { font-size: 1rem; width: 20px; text-align: center; color: var(--shell-text-dim); transition: var(--transition-fast); }
+.sidebar-link:hover { background: var(--shell-bg-alt); color: #f2f2f7; }
+.sidebar-link:hover i { color: #f2f2f7; }
+
+.sidebar-link.active {
+  background: var(--shell-active-bg);
+  color: #c7d2fe;
+  font-weight: 600;
+}
+.sidebar-link.active i { color: #a5b4fc; }
+.sidebar-link.active::before {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: var(--primary-light);
+}
+
+/* ==========================================================================
+   Main Content Area
+   ========================================================================== */
+.main-content { flex: 1; padding: 2rem 2.25rem; background: var(--slate-50); overflow-y: auto; max-width: 1440px; }
+
+@media (max-width: 768px) {
+  .app-layout { flex-direction: column; }
+  .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--shell-border); }
+  .main-content { padding: 1.25rem 1rem; }
+}
+
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; gap: 1.5rem; flex-wrap: wrap; }
+.page-title h1 { font-size: 1.55rem; margin-bottom: 0.3rem; }
+.page-title p { color: var(--slate-500); font-size: 0.9rem; }
+
+/* ==========================================================================
+   KPI Stat Cards
+   ========================================================================== */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.1rem; margin-bottom: 2rem; }
+
+.stat-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--slate-200);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  box-shadow: var(--shadow-xs);
+  transition: var(--transition);
+}
+.stat-card:hover { box-shadow: var(--shadow-sm); border-color: var(--slate-300); }
+
+.stat-icon { width: 46px; height: 46px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; }
+.stat-icon.blue   { background: var(--primary-subtle);   color: var(--primary); }
+.stat-icon.green  { background: var(--secondary-subtle); color: var(--secondary); }
+.stat-icon.amber  { background: var(--accent-subtle);    color: var(--accent); }
+.stat-icon.red    { background: var(--danger-subtle);    color: var(--danger); }
+.stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+
+.stat-info h4 { font-size: 0.76rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--slate-500); margin-bottom: 0.3rem; }
+.stat-value { font-size: 1.55rem; font-weight: 800; color: var(--slate-900); letter-spacing: -0.02em; line-height: 1.2; }
+
+/* ==========================================================================
+   Quick Action Tiles
+   ========================================================================== */
+.actions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.75rem; }
+
+.action-tile {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+  text-decoration: none;
+  transition: var(--transition);
+  color: var(--slate-800);
+}
+
+.action-tile i { font-size: 1.4rem; color: var(--primary); background: var(--primary-subtle); width: 42px; height: 42px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; transition: var(--transition-fast); }
+.action-tile:hover { box-shadow: var(--shadow-md); border-color: var(--primary-light); transform: translateY(-1px); }
+.action-tile:hover i { background: var(--primary); color: var(--white); }
+.action-tile strong { font-size: 0.98rem; font-weight: 700; color: var(--slate-900); }
+.action-tile .form-text { margin-top: 0; }
+
+/* ==========================================================================
+   Claim Step Timeline
+   ========================================================================== */
+.claim-timeline {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 2rem 1.5rem; position: relative; margin: 1.5rem 0;
+  background: var(--white); border-radius: var(--radius); border: 1px solid var(--slate-200);
+}
+
+.claim-timeline::before { content: ''; position: absolute; top: 46px; left: 60px; right: 60px; height: 3px; background: var(--slate-200); z-index: 1; }
+
+.timeline-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; text-align: center; width: 130px; }
+
+.step-circle {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--white);
+  border: 2px solid var(--slate-300); display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem; color: var(--slate-400); margin-bottom: 0.75rem; transition: var(--transition);
+}
+
+.timeline-step.active .step-circle { background: var(--primary); border-color: var(--primary); color: var(--white); box-shadow: var(--shadow-glow); }
+.timeline-step.completed .step-circle { background: var(--secondary); border-color: var(--secondary); color: var(--white); }
+.timeline-step.rejected .step-circle { background: var(--danger); border-color: var(--danger); color: var(--white); }
+
+.step-label { font-size: 0.82rem; font-weight: 700; color: var(--slate-700); margin-bottom: 0.15rem; }
+.step-date { font-size: 0.72rem; color: var(--slate-400); }
